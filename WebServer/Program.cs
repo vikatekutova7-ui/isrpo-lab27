@@ -1,8 +1,24 @@
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
+using System.Reflection.Emit;
+using System.Runtime.InteropServices.Marshalling;
 
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
+
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"[LOG] Ответ отправлен: {context.Request.Method} {context.Request.Path}");
+        await next(context);
+    Console.WriteLine($"[LOG] Ответ отправлен {context.Request.Method} {context.Request.Path}");
+});
+
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Append("X-powered-By", "ASP.NET Core Lab27");
+    await next(context);
+});
 
 app.MapGet("/", () => "Добро пожаловать на сервер!");
 app.MapGet("/about", () => "Это мой первый ASP.NET Core сервер");
